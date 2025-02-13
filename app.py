@@ -39,31 +39,13 @@ def create_app() -> Flask:
     def get_request_container():
         return RequestContainer(shared_container=app.shared_container)
 
-    @app.route('/api/v1/cooking-club/membership/command/submit-application', methods=['POST'])
-    async def submit_application():
-        container = get_request_container()
-        controller = container.submit_application_controller()
-        return await controller.handle_submit_application(request)
 
-    @app.route('/api/v1/cooking-club/membership/query/members-by-cuisine', methods=['POST'])
-    async def members_by_cuisine():
+    @app.route('/api/v1/administration/administrator/command/sign-up', methods=['POST'])
+    async def admin_sign_up():
         container = get_request_container()
-        controller = container.members_by_cuisine_query_controller()
-        return await controller.handle_members_by_cuisine(request)
+        controller = container.administrator_sign_up_command_controller()
+        return await controller.handle_sign_up(request)
 
-    @app.route('/api/v1/cooking-club/membership/projection/members-by-cuisine', methods=['POST'])
-    async def project_members_by_cuisine():
-        ambar_auth(request)
-        container = get_request_container()
-        controller = container.members_by_cuisine_projection_controller()
-        return await controller.handle_projection_request(request)
-
-    @app.route('/api/v1/cooking-club/membership/reaction/evaluate-application', methods=['POST'])
-    async def evaluate_application():
-        ambar_auth(request)
-        container = get_request_container()
-        controller = container.evaluate_application_controller()
-        return await controller.handle_reaction_request(request)
 
     @app.route('/docker_healthcheck')
     @app.route('/')

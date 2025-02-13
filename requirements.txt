@@ -10,3 +10,4 @@ gunicorn==21.2.0
 uvicorn==0.25.0
 asgiref==3.7.2
 pytz==2024.1
+bcrypt==4.2.1

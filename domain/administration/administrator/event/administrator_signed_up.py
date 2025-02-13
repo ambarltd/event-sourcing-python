@@ -1,8 +1,8 @@
 from datetime import datetime
 from common.event.creation_event import CreationEvent
-from domain.cooking_club.membership.aggregate.membership import Membership, MembershipStatus
+from domain.administration.administrator.aggregate.administrator import Administrator
 
-class ApplicationSubmitted(CreationEvent[Membership]):
+class AdministratorSignedUp(CreationEvent[Administrator]):
     def __init__(
         self,
         event_id: str,
@@ -13,9 +13,8 @@ class ApplicationSubmitted(CreationEvent[Membership]):
         recorded_on: datetime,
         first_name: str,
         last_name: str,
-        favorite_cuisine: str,
-        years_of_professional_experience: int,
-        number_of_cooking_books_read: int,
+        email: str,
+        hashed_password: str
     ):
         super().__init__(
             event_id=event_id,
@@ -27,15 +26,16 @@ class ApplicationSubmitted(CreationEvent[Membership]):
         )
         self.first_name = first_name
         self.last_name = last_name
-        self.favorite_cuisine = favorite_cuisine
-        self.years_of_professional_experience = years_of_professional_experience
-        self.number_of_cooking_books_read = number_of_cooking_books_read
+        self.email = email
+        self.hashed_password = hashed_password
 
-    def create_aggregate(self) -> Membership:
-        return Membership(
+    def create_aggregate(self) -> Administrator:
+        return Administrator(
             aggregate_id=self.aggregate_id,
             aggregate_version=self.aggregate_version,
             first_name=self.first_name,
             last_name=self.last_name,
-            status=MembershipStatus.REQUESTED
+            email=self.email,
+            is_email_verified=False,
+            hashed_password=self.hashed_password
         )

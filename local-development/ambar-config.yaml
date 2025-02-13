@@ -26,21 +26,3 @@ data_sources:
 ##########################
 
 data_destinations:
-
-  - id: CookingClub_Membership_Projection_MembersByCuisine
-    description: CookingClub_Membership_Projection_MembersByCuisine
-    type: http-push
-    endpoint: http://172.97.0.11:8080/api/v1/cooking-club/membership/projection/members-by-cuisine
-    username: username
-    password: password
-    sources:
-      - postgres_source
-
-  - id: CookingClub_Membership_Reaction_ReviewApplication
-    description: CookingClub_Membership_Reaction_ReviewApplication
-    type: http-push
-    endpoint: http://172.97.0.11:8080/api/v1/cooking-club/membership/reaction/evaluate-application
-    username: username
-    password: password
-    sources:
-      - postgres_source

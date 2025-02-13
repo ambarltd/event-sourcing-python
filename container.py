@@ -7,25 +7,8 @@ from common.event_store.postgres_transactional_event_store import PostgresTransa
 from common.projection.mongo_transactional_projection_operator import MongoTransactionalProjectionOperator
 from common.util.mongo_initializer import MongoInitializer
 from common.util.postgres_initializer import PostgresInitializer
-from domain.cooking_club.membership.command.submit_application.submit_application_command_controller import \
-    SubmitApplicationCommandController
-from domain.cooking_club.membership.command.submit_application.submit_application_command_handler import \
-    SubmitApplicationCommandHandler
-from domain.cooking_club.membership.projection.members_by_cuisine.members_by_cuisine_projection_controller import \
-    MembersByCuisineProjectionController
-from domain.cooking_club.membership.reaction.evaluate_application.evaluate_application_reaction_handler import \
-    EvaluateApplicationReactionHandler
-from domain.cooking_club.membership.reaction.evaluate_application.evaluate_application_reaction_controller import \
-    EvaluateApplicationReactionController
-from domain.cooking_club.membership.projection.members_by_cuisine.members_by_cuisine_projection_handler import \
-    MembersByCuisineProjectionHandler
-from domain.cooking_club.membership.projection.members_by_cuisine.membership_application_repository import \
-    MembershipApplicationRepository
-from domain.cooking_club.membership.projection.members_by_cuisine.cuisine_repository import CuisineRepository
-from domain.cooking_club.membership.query.members_by_cuisine.members_by_cuisine_query_controller import \
-    MembersByCuisineQueryController
-from domain.cooking_club.membership.query.members_by_cuisine.members_by_cuisine_query_handler import \
-    MembersByCuisineQueryHandler
+from domain.administration.administrator.command.sign_up.sign_up_command_controller import SignUpCommandController
+from domain.administration.administrator.command.sign_up.sign_up_command_handler import SignUpCommandHandler
 
 
 class SharedContainer:
@@ -75,64 +58,11 @@ class RequestContainer:
             database_name=os.getenv('MONGODB_PROJECTION_DATABASE_NAME')
         )
 
-        self._cuisine_repository = CuisineRepository(
-            mongo_operator=self._mongo_transactional_projection_operator
-        )
-
-        self._membership_application_repository = MembershipApplicationRepository(
-            mongo_operator=self._mongo_transactional_projection_operator
-        )
-
-        self._submit_application_command_handler = SubmitApplicationCommandHandler(
-            postgres_transactional_event_store=self._postgres_transactional_event_store
-        )
-
-        self._evaluate_application_reaction_handler = EvaluateApplicationReactionHandler(
-            postgres_transactional_event_store=self._postgres_transactional_event_store
-        )
-
-        self._members_by_cuisine_projection_handler = MembersByCuisineProjectionHandler(
-            cuisine_repository=self._cuisine_repository,
-            membership_application_repository=self._membership_application_repository
-        )
-
-        self._members_by_cuisine_query_handler = MembersByCuisineQueryHandler(
-            mongo_operator=self._mongo_transactional_projection_operator,
-            cuisine_repository=self._cuisine_repository
-        )
-
-        self._submit_application_command_controller = SubmitApplicationCommandController(
+    def administrator_sign_up_command_controller(self):
+        return SignUpCommandController(
             event_store=self._postgres_transactional_event_store,
             mongo_operator=self._mongo_transactional_projection_operator,
-            submit_application_command_handler=self._submit_application_command_handler
+            sign_up_command_handler=SignUpCommandHandler(
+                postgres_transactional_event_store=self._postgres_transactional_event_store
+            )
         )
-
-        self._evaluate_application_reaction_controller = EvaluateApplicationReactionController(
-            event_store=self._postgres_transactional_event_store,
-            mongo_operator=self._mongo_transactional_projection_operator,
-            deserializer=self.shared_container.deserializer,
-            evaluate_application_reaction_handler=self._evaluate_application_reaction_handler
-        )
-
-        self._members_by_cuisine_query_controller = MembersByCuisineQueryController(
-            mongo_operator=self._mongo_transactional_projection_operator,
-            members_by_cuisine_query_handler=self._members_by_cuisine_query_handler
-        )
-
-        self._members_by_cuisine_projection_controller = MembersByCuisineProjectionController(
-            mongo_operator=self._mongo_transactional_projection_operator,
-            deserializer=self.shared_container.deserializer,
-            members_by_cuisine_projection_handler=self._members_by_cuisine_projection_handler
-        )
-
-    def submit_application_controller(self):
-        return self._submit_application_command_controller
-
-    def evaluate_application_controller(self):
-        return self._evaluate_application_reaction_controller
-
-    def members_by_cuisine_query_controller(self):
-        return self._members_by_cuisine_query_controller
-
-    def members_by_cuisine_projection_controller(self):
-        return self._members_by_cuisine_projection_controller

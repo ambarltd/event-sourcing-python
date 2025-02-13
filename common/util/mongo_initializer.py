@@ -32,9 +32,6 @@ class MongoInitializer:
 
     async def _ensure_collections(self, db) -> None:
         collections = [
-            'CookingClub_MembersByCuisine_MembershipApplication',
-            'CookingClub_MembersByCuisine_Cuisine',
-            'ProjectionIdempotency_ProjectedEvent'
         ]
 
         for collection_name in collections:
@@ -50,19 +47,11 @@ class MongoInitializer:
 
     async def _create_indexes(self, db) -> None:
         try:
-            membership_application = db['CookingClub_MembersByCuisine_MembershipApplication']
-            membership_application.create_index(
-                [('favorite_cuisine', 1)],
+            index_1 = db['db_name']
+            index_1.create_index(
+                [('field_ame', 1)],
                 background=True,
-                name='favoriteCuisine_asc'
-            )
-
-            projection_idempotency = db['ProjectionIdempotency_ProjectedEvent']
-            projection_idempotency.create_index(
-                [('eventId', 1), ('projectionName', 1)],
-                unique=True,
-                background=True,
-                name='eventId_ProjectionName_unique'
+                name='index_name_asc'
             )
 
             log.debug('Indexes created')

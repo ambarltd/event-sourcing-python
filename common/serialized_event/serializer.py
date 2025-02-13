@@ -1,8 +1,11 @@
 from datetime import datetime
 import json
 import pytz
-from domain.cooking_club.membership.event.application_submitted import ApplicationSubmitted
-from domain.cooking_club.membership.event.application_evaluated import ApplicationEvaluated
+
+from domain.administration.administrator.event.administrator_email_verification_sent import \
+    AdministratorEmailVerificationSent
+from domain.administration.administrator.event.administrator_email_verified import AdministratorEmailVerified
+from domain.administration.administrator.event.administrator_signed_up import AdministratorSignedUp
 from common.event.event import Event
 from common.serialized_event.serialized_event import SerializedEvent
 
@@ -28,24 +31,32 @@ class Serializer:
         return dt.strftime('%Y-%m-%d %H:%M:%S UTC')
 
     def _determine_event_name(self, event: Event) -> str:
-        if isinstance(event, ApplicationSubmitted):
-            return 'CookingClub_Membership_ApplicationSubmitted'
-        if isinstance(event, ApplicationEvaluated):
-            return 'CookingClub_Membership_ApplicationEvaluated'
+        if isinstance(event, AdministratorSignedUp):
+            return 'Administrator_AdministratorSignedUp'
+        if isinstance(event, AdministratorEmailVerificationSent):
+            return 'Administrator_AdministratorEmailVerificationSent'
+        if isinstance(event, AdministratorEmailVerified):
+            return 'Administrator_AdministratorEmailVerified'
         raise ValueError(f"Unknown event type: {event.__class__.__name__}")
 
     def _create_json_payload(self, event: Event) -> str:
-        if isinstance(event, ApplicationSubmitted):
+        if isinstance(event, AdministratorSignedUp):
             payload = {
                 'firstName': event.first_name,
                 'lastName': event.last_name,
-                'favoriteCuisine': event.favorite_cuisine,
-                'yearsOfProfessionalExperience': event.years_of_professional_experience,
-                'numberOfCookingBooksRead': event.number_of_cooking_books_read
+                'email': event.email,
+                'hashedPassword': event.hashed_password
             }
-        elif isinstance(event, ApplicationEvaluated):
+        elif isinstance(event, AdministratorEmailVerificationSent):
             payload = {
-                'evaluationOutcome': event.evaluation_outcome.value
+                'code': event.code,
+                'sentFrom': event.sent_from,
+                'sentTo': event.sent_to,
+                'emailContents': event.email_contents
+            }
+        elif isinstance(event, AdministratorEmailVerified):
+            payload = {
+                'withCode': event.with_code
             }
         else:
             raise ValueError(f"Unknown event type: {event.__class__.__name__}")
