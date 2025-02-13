@@ -60,6 +60,13 @@ def create_app() -> Flask:
         controller = container.administration_administrator_projection_administrator_id_from_verification_code_projection_controller()
         return await controller.handle_projection_request(request)
 
+    @app.route('/api/v1/administration/administrator/reaction/send-verification-email', methods=['POST'])
+    async def send_admin_verification_email():
+        ambar_auth(request)
+        container = get_request_container()
+        controller = container.administration_administrator_reaction_send_administrator_verification_email_controller()
+        return await controller.handle_reaction_request(request)
+
 
     @app.route('/docker_healthcheck')
     @app.route('/')

@@ -25,11 +25,8 @@ class VerifyAdministratorEmailCommandHandler(CommandHandler):
         if not isinstance(administrator_id, str):
             raise ValueError("Invalid code")
 
-        aggregate_data = await self._postgres_transactional_event_store.find_aggregate(administrator_id)
+        aggregate_data = await self._postgres_transactional_event_store.find_aggregate(administrator_id, Administrator)
         administrator = aggregate_data.aggregate
-
-        if not isinstance(administrator, Administrator):
-            raise ValueError("Administrator not found")
 
         if administrator.is_email_verified:
             raise ValueError("Administrator email already verified")

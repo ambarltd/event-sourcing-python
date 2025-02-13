@@ -4,7 +4,7 @@ from common.command.command_controller import CommandController
 from common.event_store.postgres_transactional_event_store import PostgresTransactionalEventStore
 from common.projection.mongo_transactional_projection_operator import MongoTransactionalProjectionOperator
 from domain.administration.administrator.command.sign_up_as_administrator.sign_up_as_administrator_command import SignUpAsAdministratorCommand
-from domain.administration.administrator.command.sign_up_as_administrator.sign_up_command_handler import SignUpAsAdministratorCommandHandler
+from domain.administration.administrator.command.sign_up_as_administrator.sign_up_as_administrator_command_handler import SignUpAsAdministratorCommandHandler
 
 class SignUpAsAdministratorRequest(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=100)

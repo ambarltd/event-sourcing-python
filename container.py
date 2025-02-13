@@ -1,4 +1,6 @@
 import os
+
+from common.util.email_sender import EmailSender
 from common.util.postgres_connection_pool import PostgresConnectionPool
 from common.util.mongo_session_pool import MongoSessionPool
 from common.serialized_event.deserializer import Deserializer
@@ -8,7 +10,7 @@ from common.projection.mongo_transactional_projection_operator import MongoTrans
 from common.util.mongo_initializer import MongoInitializer
 from common.util.postgres_initializer import PostgresInitializer
 from domain.administration.administrator.command.sign_up_as_administrator.sign_up_as_administrator_command_controller import SignUpAsAdministratorCommandController
-from domain.administration.administrator.command.sign_up_as_administrator.sign_up_command_handler import SignUpAsAdministratorCommandHandler
+from domain.administration.administrator.command.sign_up_as_administrator.sign_up_as_administrator_command_handler import SignUpAsAdministratorCommandHandler
 from domain.administration.administrator.command.verify_administrator_email.verify_administrator_email_command_controller import \
     VerifyAdministratorEmailCommandController
 from domain.administration.administrator.command.verify_administrator_email.verify_administrator_email_command_handler import \
@@ -21,6 +23,10 @@ from domain.administration.administrator.projection.administrator_id_from_verifi
     AdministratorIdFromVerificationCodeProjectionController
 from domain.administration.administrator.projection.administrator_id_from_verification_code.administrator_id_from_verification_code_projection_handler import \
     AdministratorIdFromVerificationCodeProjectionHandler
+from domain.administration.administrator.reaction.send_administrator_verification_email.send_administrator_verification_email_reaction_controller import \
+    SendAdministratorVerificationEmailReactionController
+from domain.administration.administrator.reaction.send_administrator_verification_email.send_administrator_verification_email_reaction_handler import \
+    SendAdministratorVerificationEmailReactionHandler
 
 
 class SharedContainer:
@@ -38,6 +44,13 @@ class SharedContainer:
         )
         self.serializer = Serializer()
         self.deserializer = Deserializer()
+        self.email_sender = EmailSender(
+            smtp_host=os.getenv('SMTP_HOST'),
+            smtp_port=int(os.getenv('SMTP_PORT')),
+            smtp_username=os.getenv('SMTP_USERNAME'),
+            smtp_password=os.getenv('SMTP_PASSWORD'),
+            smtp_from_email_for_administrators=os.getenv('SMTP_FROM_EMAIL_FOR_ADMINISTRATORS')
+        );
 
         # Initializers
         self.postgres_initializer = PostgresInitializer(
@@ -70,6 +83,7 @@ class RequestContainer:
             database_name=os.getenv('MONGODB_PROJECTION_DATABASE_NAME')
         )
 
+
     def administration_administrator_command_administrator_sign_up_as_administrator_command_controller(self):
         return SignUpAsAdministratorCommandController(
             event_store=self._postgres_transactional_event_store,
@@ -79,6 +93,7 @@ class RequestContainer:
                 mongo_transactional_projection_operator=self._mongo_transactional_projection_operator
             )
         )
+
 
     def administration_administrator_command_verify_administrator_email_command_controller(self):
         return VerifyAdministratorEmailCommandController(
@@ -96,6 +111,7 @@ class RequestContainer:
             )
         )
 
+
     def administration_administrator_projection_administrator_id_from_verification_code_projection_controller(self):
         return AdministratorIdFromVerificationCodeProjectionController(
             mongo_operator=self._mongo_transactional_projection_operator,
@@ -104,5 +120,18 @@ class RequestContainer:
                 verification_code_repository=AdministratorAndVerificationCodeRepository(
                     self._mongo_transactional_projection_operator
                 )
+            )
+        )
+
+
+
+    def administration_administrator_reaction_send_administrator_verification_email_controller(self):
+        return SendAdministratorVerificationEmailReactionController(
+            event_store=self._postgres_transactional_event_store,
+            mongo_operator=self._mongo_transactional_projection_operator,
+            deserializer=self.shared_container.deserializer,
+            send_administrator_verification_email_reaction_handler=SendAdministratorVerificationEmailReactionHandler(
+                postgres_transactional_event_store=self._postgres_transactional_event_store,
+                email_sender=self.shared_container.email_sender
             )
         )

@@ -1,4 +1,4 @@
-from typing import TypeVar, Optional, List
+from typing import TypeVar, Optional, List, Type
 
 from common.event_store.aggregate_does_not_exist import AggregateDoesNotExist
 from common.util.postgres_connection_pool import PostgresConnectionPool
@@ -45,7 +45,7 @@ class PostgresTransactionalEventStore:
                 (error_message[:max_len] if len(error_message) > max_len else error_message)
             )
 
-    async def find_aggregate(self, aggregate_id: str) -> AggregateAndEventIdsInLastEvent[T]:
+    async def find_aggregate(self, aggregate_id: str, aggregate_type: Type[T]) -> AggregateAndEventIdsInLastEvent[T]:
         if not self._active_transaction:
             raise RuntimeError('Transaction must be active to perform find aggregate operations!')
 
@@ -65,12 +65,18 @@ class PostgresTransactionalEventStore:
         event_id_of_last_event = creation_event.event_id
         correlation_id_of_last_event = creation_event.correlation_id
 
+        if not isinstance(aggregate, aggregate_type):
+            raise RuntimeError('Created aggregate type does not match expected type')
+
         for transformation_event in transformation_events:
             if not isinstance(transformation_event, TransformationEvent):
                 raise RuntimeError('Event is not a transformation event')
             aggregate = transformation_event.transform_aggregate(aggregate)
             event_id_of_last_event = transformation_event.event_id
             correlation_id_of_last_event = transformation_event.correlation_id
+
+            if not isinstance(aggregate, aggregate_type):
+                raise RuntimeError('Transformed aggregate type does not match expected type')
 
         return AggregateAndEventIdsInLastEvent(
             aggregate=aggregate,

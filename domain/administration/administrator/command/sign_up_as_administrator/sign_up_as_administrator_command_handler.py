@@ -8,6 +8,8 @@ from domain.administration.administrator.event.administrator_signed_up import Ad
 import secrets
 import string
 
+from domain.administration.administrator_email.aggregate.administrator_email import AdministratorEmail
+
 
 class SignUpAsAdministratorCommandHandler(CommandHandler):
     async def handle_command(self, command: SignUpAsAdministratorCommand) -> None:
@@ -16,7 +18,7 @@ class SignUpAsAdministratorCommandHandler(CommandHandler):
 
         administrator_email_id = self._generate_administrator_email_id(command.email)
         try:
-            await self._postgres_transactional_event_store.find_aggregate(administrator_email_id)
+            await self._postgres_transactional_event_store.find_aggregate(administrator_email_id, AdministratorEmail)
             raise ValueError("Email is already registered")
         except AggregateDoesNotExist:
             pass
