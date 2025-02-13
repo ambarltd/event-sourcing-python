@@ -22,6 +22,11 @@ services:
       MONGODB_PROJECTION_DATABASE_PASSWORD: "my_mongo_password"
       AMBAR_HTTP_USERNAME: "username"
       AMBAR_HTTP_PASSWORD: "password"
+      SMTP_HOST: "172.97.0.213"
+      SMTP_PORT: "1025"
+      SMTP_USERNAME: ""
+      SMTP_PASSWORD: ""
+      SMTP_FROM_EMAIL_FOR_ADMINISTRATORS: "from-email-for-administrators@localhost"
     depends_on:
       event-sourcing-event-store:
         condition: service_healthy
@@ -182,6 +187,22 @@ services:
         ipv4_address: 172.97.0.212
     ports:
       - "8082:8082"
+
+  event-sourcing-email-server:
+    image: mailhog/mailhog:v1.0.1
+    container_name: event-sourcing-email-server
+    restart: always
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "--quiet", "http://localhost:8025" ]
+      timeout: 2s
+      interval: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      event-sourcing:
+        ipv4_address: 172.97.0.213
+    ports:
+      - "8083:8025"
 
 
 networks:

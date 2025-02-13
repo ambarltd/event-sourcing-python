@@ -28,13 +28,13 @@ try {
     Write-Host ""
 
     Write-Host "======================================================================="
-    Write-Host "|| You can now run the dev_demo.ps1 script!                           ||"
-    Write-Host "======================================================================="
     Write-Host "|| You can navigate to localhost:8080 to hit your backend.            ||"
     Write-Host "======================================================================="
     Write-Host "|| You can navigate to localhost:8081 to view your event store.       ||"
     Write-Host "======================================================================="
     Write-Host "|| You can navigate to localhost:8082 to view your projection store.  ||"
+    Write-Host "======================================================================="
+    Write-Host "|| You can navigate to localhost:8083 to view your email server.      ||"
     Write-Host "======================================================================="
 
 } finally {

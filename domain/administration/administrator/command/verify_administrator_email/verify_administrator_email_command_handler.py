@@ -8,7 +8,8 @@ from domain.administration.administrator.command.verify_administrator_email.veri
 from domain.administration.administrator.event.administrator_email_verified import AdministratorEmailVerified
 from domain.administration.administrator.projection.administrator_id_from_verification_code.administrator_id_from_verification_code import \
     AdministratorIdFromVerificationCode
-from domain.administration.administrator_email.event.administrator_email_taken import AdministratorEmailTaken
+from domain.administration.administrator_email.event.administrator_email_taken import AdministratorEmailTaken, \
+    administrator_email_aggregate_id_from_email
 
 
 class VerifyAdministratorEmailCommandHandler(CommandHandler):
@@ -51,6 +52,7 @@ class VerifyAdministratorEmailCommandHandler(CommandHandler):
         admin_email_taken = AdministratorEmailTaken(
             event_id=admin_email_taken_event_id,
             aggregate_version=1,
+            aggregate_id=administrator_email_aggregate_id_from_email(administrator.email.lower()),
             correlation_id=admin_email_taken_event_id,
             causation_id=admin_email_taken_event_id,
             recorded_on=datetime.utcnow(),

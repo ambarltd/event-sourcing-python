@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from common.aggregate.aggregate import Aggregate
-from common.util.id_generator import IdGenerator
 
 
 @dataclass

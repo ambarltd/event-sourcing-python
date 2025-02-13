@@ -10,7 +10,7 @@ from domain.administration.administrator.command.verify_administrator_email.veri
 
 
 class VerifyAdministratorEmailRequest(BaseModel):
-    verification_code: str = Field(..., min_length=20, max_length=20)
+    verification_code: str = Field(..., min_length=10, max_length=30)
 
 
 class VerifyAdministratorEmailCommandController(CommandController):

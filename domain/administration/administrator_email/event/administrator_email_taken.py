@@ -8,6 +8,7 @@ class AdministratorEmailTaken(CreationEvent[AdministratorEmail]):
     def __init__(
         self,
         event_id: str,
+        aggregate_id: str,
         aggregate_version: int,
         correlation_id: str,
         causation_id: str,
@@ -17,7 +18,7 @@ class AdministratorEmailTaken(CreationEvent[AdministratorEmail]):
     ):
         super().__init__(
             event_id=event_id,
-            aggregate_id=administrator_email_aggregate_id_from_email(lowercase_email),
+            aggregate_id=aggregate_id,
             aggregate_version=aggregate_version,
             correlation_id=correlation_id,
             causation_id=causation_id,
@@ -38,4 +39,4 @@ class AdministratorEmailTaken(CreationEvent[AdministratorEmail]):
 def administrator_email_aggregate_id_from_email(email: str) -> str:
     lowercase_email = email.lower()
     return IdGenerator.generate_deterministic_id(
-        f"Unique:Administration_Administrator_AdministratorEmail:{lowercase_email}")
+        f"UniqueAggregate:Administration_Administrator_AdministratorEmail:{lowercase_email}")

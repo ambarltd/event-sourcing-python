@@ -21,10 +21,10 @@ class SendAdministratorVerificationEmailReactionHandler(ReactionHandler):
         if not isinstance(event, AdministratorSignedUp):
             return
 
-        event_id = IdGenerator.generate_deterministic_id(
-            f"Reaction:Administration_Administrator_SendAdministratorVerificationEmail:{event.aggregate_id}"
+        reaction_event_id = IdGenerator.generate_deterministic_id(
+            f"UniqueReaction:Administration_Administrator_SendAdministratorVerificationEmail:{event.aggregate_id}"
         )
-        if await self._postgres_transactional_event_store.does_event_already_exist(event_id):
+        if await self._postgres_transactional_event_store.does_event_already_exist(reaction_event_id):
             return
 
         aggregate_data = await self._postgres_transactional_event_store.find_aggregate(event.aggregate_id, Administrator)
@@ -45,21 +45,21 @@ class SendAdministratorVerificationEmailReactionHandler(ReactionHandler):
         <p>Best regards,<br>Your Platform Team</p>
         """
 
-        await self._email_sender.send_email_to_administrator(
+        sent_from = await self._email_sender.send_email_to_administrator_and_return_sent_from(
             to_email=event.email,
             subject="Verify Your Email Address",
             html_content=html_content
         )
 
         sent_event = AdministratorEmailVerificationSent(
-            event_id=event_id,
+            event_id=reaction_event_id,
             aggregate_id=event.aggregate_id,
             aggregate_version=event.aggregate_version + 1,
             correlation_id=event.correlation_id,
             causation_id=event.event_id,
             recorded_on=datetime.utcnow(),
             code=verification_code,
-            sent_from=self._email_sender._from_email_for_administrators,
+            sent_from=sent_from,
             sent_to=event.email,
             email_contents=html_content
         )

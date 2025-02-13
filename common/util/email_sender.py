@@ -19,13 +19,13 @@ class EmailSender:
         self._smtp_password = smtp_password
         self._from_email_for_administrators = smtp_from_email_for_administrators
 
-    async def send_email_to_administrator(
+    async def send_email_to_administrator_and_return_sent_from(
             self,
             to_email: str,
             subject: str,
             html_content: str,
             text_content: Optional[str] = None
-    ) -> None:
+    ) -> str:
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = self._from_email_for_administrators
@@ -48,3 +48,5 @@ class EmailSender:
                 server.send_message(msg)
         except Exception as e:
             raise RuntimeError(f"Failed to send email: {str(e)}")
+
+        return self._from_email_for_administrators

@@ -14,7 +14,7 @@ class SignUpAsAdministratorCommandHandler(CommandHandler):
         event_id = IdGenerator.generate_random_id()
 
         hashed_password = bcrypt.hashpw(command.password.encode(), bcrypt.gensalt()).decode()
-        verification_code = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(15))  # 14 alphanumeric characters ~= 2^90 possibilities
+        verification_code = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(15))  # 15 alphanumeric characters ~= 2^90 possibilities
 
         admin_signed_up = AdministratorSignedUp(
             event_id=event_id,
