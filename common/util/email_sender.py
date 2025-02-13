@@ -43,7 +43,9 @@ class EmailSender:
 
         try:
             with smtplib.SMTP(self._smtp_host, self._smtp_port) as server:
-                server.starttls()
+                # Only use STARTTLS if not connecting to development mail server
+                if not self._smtp_host.startswith('172.97.'):
+                    server.starttls()
                 server.login(self._smtp_username, self._smtp_password)
                 server.send_message(msg)
         except Exception as e:

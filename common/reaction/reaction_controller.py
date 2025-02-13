@@ -65,4 +65,4 @@ class ReactionController:
             await self._mongo_transactional_projection_operator.abort_dangling_transactions_and_return_session_to_pool()
 
             log.error('Exception in ProcessReactionHttpRequest:', error=error)
-            return Response(AmbarResponseFactory.retry_response(ex), content_type='application/json'), 200
+            return Response(AmbarResponseFactory.retry_response(error), content_type='application/json'), 200

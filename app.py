@@ -60,6 +60,7 @@ def create_app() -> Flask:
         controller = container.administration_administrator_projection_administrator_id_from_verification_code_projection_controller()
         return await controller.handle_projection_request(request)
 
+
     @app.route('/api/v1/administration/administrator/reaction/send-administrator-verification-email', methods=['POST'])
     async def administration_administrator_reaction_send_administrator_verification_email_controller():
         ambar_auth(request)

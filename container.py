@@ -132,6 +132,7 @@ class RequestContainer:
             deserializer=self.shared_container.deserializer,
             send_administrator_verification_email_reaction_handler=SendAdministratorVerificationEmailReactionHandler(
                 postgres_transactional_event_store=self._postgres_transactional_event_store,
+                mongo_transactional_projection_operator=self._mongo_transactional_projection_operator,
                 email_sender=self.shared_container.email_sender
             )
         )

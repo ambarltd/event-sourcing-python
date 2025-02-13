@@ -1,4 +1,7 @@
 from datetime import datetime
+
+from common.event_store.postgres_transactional_event_store import PostgresTransactionalEventStore
+from common.projection.mongo_transactional_projection_operator import MongoTransactionalProjectionOperator
 from common.reaction.reaction_handler import ReactionHandler
 from common.event.event import Event
 from common.util.id_generator import IdGenerator
@@ -11,10 +14,11 @@ from domain.administration.administrator.event.administrator_email_verification_
 class SendAdministratorVerificationEmailReactionHandler(ReactionHandler):
     def __init__(
         self,
-        postgres_transactional_event_store,
+        postgres_transactional_event_store: PostgresTransactionalEventStore,
+        mongo_transactional_projection_operator: MongoTransactionalProjectionOperator,
         email_sender: EmailSender,
     ):
-        super().__init__(postgres_transactional_event_store)
+        super().__init__(postgres_transactional_event_store, mongo_transactional_projection_operator)
         self._email_sender = email_sender
 
     async def react(self, event: Event) -> None:

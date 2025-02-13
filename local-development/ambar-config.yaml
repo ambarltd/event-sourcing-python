@@ -39,7 +39,7 @@ data_destinations:
   - id: Administration_Administrator_Reaction_SendAdministratorVerificationEmail
     description: Administration_Administrator_Reaction_SendAdministratorVerificationEmail
     type: http-push
-    endpoint: http://172.97.0.11:8080/api/v1/administration/administrator/reaction/send-adminsitrator-verification-email
+    endpoint: http://172.97.0.11:8080/api/v1/administration/administrator/reaction/send-administrator-verification-email
     username: username
     password: password
     sources:
