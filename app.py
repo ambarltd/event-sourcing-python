@@ -40,11 +40,25 @@ def create_app() -> Flask:
         return RequestContainer(shared_container=app.shared_container)
 
 
-    @app.route('/api/v1/administration/administrator/command/sign-up', methods=['POST'])
+    @app.route('/api/v1/administration/administrator/command/sign-up-as-administrator', methods=['POST'])
     async def admin_sign_up():
         container = get_request_container()
-        controller = container.administrator_sign_up_command_controller()
+        controller = container.administration_administrator_command_administrator_sign_up_as_administrator_command_controller()
         return await controller.handle_sign_up(request)
+
+
+    @app.route('/api/v1/administration/administrator/command/verify-administrator-email', methods=['POST'])
+    async def admin_sign_up():
+        container = get_request_container()
+        controller = container.administration_administrator_command_verify_administrator_email_command_controller()
+        return await controller.handle_sign_up(request)
+
+    @app.route('/api/v1/administration/administrator/projection/administrator-id-from-verification-code', methods=['POST'])
+    async def project_members_by_cuisine():
+        ambar_auth(request)
+        container = get_request_container()
+        controller = container.administration_administrator_projection_administrator_id_from_verification_code_projection_controller()
+        return await controller.handle_projection_request(request)
 
 
     @app.route('/docker_healthcheck')

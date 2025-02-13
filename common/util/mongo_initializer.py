@@ -1,3 +1,5 @@
+import pymongo
+
 from common.util.mongo_session_pool import MongoSessionPool
 from common.util.logger import log
 
@@ -32,6 +34,7 @@ class MongoInitializer:
 
     async def _ensure_collections(self, db) -> None:
         collections = [
+            'Administration_Administrator_AdministratorAndVerificationCode',
         ]
 
         for collection_name in collections:
@@ -47,11 +50,10 @@ class MongoInitializer:
 
     async def _create_indexes(self, db) -> None:
         try:
-            index_1 = db['db_name']
-            index_1.create_index(
-                [('field_ame', 1)],
+            db['Administration_Administrator_AdministratorAndVerificationCode'].create_index(
+                [('verification_code', pymongo.ASCENDING)],
                 background=True,
-                name='index_name_asc'
+                name='Administration_Administrator_AdministratorAndVerificationCode_VerificationCode_Asc'
             )
 
             log.debug('Indexes created')

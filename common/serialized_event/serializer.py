@@ -45,7 +45,8 @@ class Serializer:
                 'firstName': event.first_name,
                 'lastName': event.last_name,
                 'email': event.email,
-                'hashedPassword': event.hashed_password
+                'hashedPassword': event.hashed_password,
+                'verificationCode': event.verification_code
             }
         elif isinstance(event, AdministratorEmailVerificationSent):
             payload = {

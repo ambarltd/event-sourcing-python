@@ -14,7 +14,8 @@ class AdministratorSignedUp(CreationEvent[Administrator]):
         first_name: str,
         last_name: str,
         email: str,
-        hashed_password: str
+        hashed_password: str,
+        verification_code: str
     ):
         super().__init__(
             event_id=event_id,
@@ -28,6 +29,7 @@ class AdministratorSignedUp(CreationEvent[Administrator]):
         self.last_name = last_name
         self.email = email
         self.hashed_password = hashed_password
+        self.verification_code = verification_code
 
     def create_aggregate(self) -> Administrator:
         return Administrator(
@@ -37,5 +39,6 @@ class AdministratorSignedUp(CreationEvent[Administrator]):
             last_name=self.last_name,
             email=self.email,
             is_email_verified=False,
-            hashed_password=self.hashed_password
+            hashed_password=self.hashed_password,
+            verification_code=self.verification_code
         )

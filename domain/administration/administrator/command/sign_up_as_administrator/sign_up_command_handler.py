@@ -1,29 +1,28 @@
 from datetime import datetime
-import hashlib
 import bcrypt
 from common.command.command_handler import CommandHandler
+from common.event_store.aggregate_does_not_exist import AggregateDoesNotExist
 from common.util.id_generator import IdGenerator
-from domain.administration.administrator.command.sign_up.sign_up_command import SignUpCommand
+from domain.administration.administrator.command.sign_up_as_administrator.sign_up_as_administrator_command import SignUpAsAdministratorCommand
 from domain.administration.administrator.event.administrator_signed_up import AdministratorSignedUp
-
-def _generate_administrator_email_id(email: str) -> str:
-    normalized_email = email.lower()
-    return IdGenerator.generate_deterministic_id(f"administrator_email:{normalized_email}")
+import secrets
+import string
 
 
-class SignUpCommandHandler(CommandHandler):
-    async def handle_command(self, command: SignUpCommand) -> None:
+class SignUpAsAdministratorCommandHandler(CommandHandler):
+    async def handle_command(self, command: SignUpAsAdministratorCommand) -> None:
         administrator_id = IdGenerator.generate_random_id()
         event_id = IdGenerator.generate_random_id()
 
-        administrator_email_id = _generate_administrator_email_id(command.email)
+        administrator_email_id = self._generate_administrator_email_id(command.email)
         try:
             await self._postgres_transactional_event_store.find_aggregate(administrator_email_id)
             raise ValueError("Email is already registered")
-        except RuntimeError:
+        except AggregateDoesNotExist:
             pass
 
         hashed_password = bcrypt.hashpw(command.password.encode(), bcrypt.gensalt()).decode()
+        verification_code = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(15))  # 14 alphanumeric characters ~= 2^90 possibilities
 
         admin_signed_up = AdministratorSignedUp(
             event_id=event_id,
@@ -35,8 +34,12 @@ class SignUpCommandHandler(CommandHandler):
             first_name=command.first_name,
             last_name=command.last_name,
             email=command.email,
-            hashed_password=hashed_password
+            hashed_password=hashed_password,
+            verification_code=verification_code
         )
 
         await self._postgres_transactional_event_store.save_event(admin_signed_up)
 
+    def _generate_administrator_email_id(self, email: str) -> str:
+        lowercase_email = email.lower()
+        return IdGenerator.generate_deterministic_id(f"Unique:Administration_Administrator_AdministratorEmail:{lowercase_email}")

@@ -7,8 +7,20 @@ from common.event_store.postgres_transactional_event_store import PostgresTransa
 from common.projection.mongo_transactional_projection_operator import MongoTransactionalProjectionOperator
 from common.util.mongo_initializer import MongoInitializer
 from common.util.postgres_initializer import PostgresInitializer
-from domain.administration.administrator.command.sign_up.sign_up_command_controller import SignUpCommandController
-from domain.administration.administrator.command.sign_up.sign_up_command_handler import SignUpCommandHandler
+from domain.administration.administrator.command.sign_up_as_administrator.sign_up_as_administrator_command_controller import SignUpAsAdministratorCommandController
+from domain.administration.administrator.command.sign_up_as_administrator.sign_up_command_handler import SignUpAsAdministratorCommandHandler
+from domain.administration.administrator.command.verify_administrator_email.verify_administrator_email_command_controller import \
+    VerifyAdministratorEmailCommandController
+from domain.administration.administrator.command.verify_administrator_email.verify_administrator_email_command_handler import \
+    VerifyAdministratorEmailCommandHandler
+from domain.administration.administrator.projection.administrator_id_from_verification_code.administrator_and_verification_code_repository import \
+    AdministratorAndVerificationCodeRepository
+from domain.administration.administrator.projection.administrator_id_from_verification_code.administrator_id_from_verification_code import \
+    AdministratorIdFromVerificationCode
+from domain.administration.administrator.projection.administrator_id_from_verification_code.administrator_id_from_verification_code_projection_controller import \
+    AdministratorIdFromVerificationCodeProjectionController
+from domain.administration.administrator.projection.administrator_id_from_verification_code.administrator_id_from_verification_code_projection_handler import \
+    AdministratorIdFromVerificationCodeProjectionHandler
 
 
 class SharedContainer:
@@ -58,11 +70,39 @@ class RequestContainer:
             database_name=os.getenv('MONGODB_PROJECTION_DATABASE_NAME')
         )
 
-    def administrator_sign_up_command_controller(self):
-        return SignUpCommandController(
+    def administration_administrator_command_administrator_sign_up_as_administrator_command_controller(self):
+        return SignUpAsAdministratorCommandController(
             event_store=self._postgres_transactional_event_store,
             mongo_operator=self._mongo_transactional_projection_operator,
-            sign_up_command_handler=SignUpCommandHandler(
-                postgres_transactional_event_store=self._postgres_transactional_event_store
+            sign_up_as_administrator_command_handler=SignUpAsAdministratorCommandHandler(
+                postgres_transactional_event_store=self._postgres_transactional_event_store,
+                mongo_transactional_projection_operator=self._mongo_transactional_projection_operator
+            )
+        )
+
+    def administration_administrator_command_verify_administrator_email_command_controller(self):
+        return VerifyAdministratorEmailCommandController(
+            event_store=self._postgres_transactional_event_store,
+            mongo_operator=self._mongo_transactional_projection_operator,
+            verify_administrator_email_command_handler=VerifyAdministratorEmailCommandHandler(
+                postgres_transactional_event_store=self._postgres_transactional_event_store,
+                mongo_transactional_projection_operator=self._mongo_transactional_projection_operator,
+                administrator_id_from_verification_code=AdministratorIdFromVerificationCode(
+                    AdministratorAndVerificationCodeRepository(
+                        mongo_operator=self._mongo_transactional_projection_operator
+                    )
+                )
+
+            )
+        )
+
+    def administration_administrator_projection_administrator_id_from_verification_code_projection_controller(self):
+        return AdministratorIdFromVerificationCodeProjectionController(
+            mongo_operator=self._mongo_transactional_projection_operator,
+            deserializer=self.shared_container.deserializer,
+            administrator_id_from_verification_code_projection_handler=AdministratorIdFromVerificationCodeProjectionHandler(
+                verification_code_repository=AdministratorAndVerificationCodeRepository(
+                    self._mongo_transactional_projection_operator
+                )
             )
         )

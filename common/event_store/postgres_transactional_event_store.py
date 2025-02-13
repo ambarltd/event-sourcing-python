@@ -1,4 +1,6 @@
 from typing import TypeVar, Optional, List
+
+from common.event_store.aggregate_does_not_exist import AggregateDoesNotExist
 from common.util.postgres_connection_pool import PostgresConnectionPool
 from common.serialized_event.serializer import Serializer
 from common.serialized_event.deserializer import Deserializer
@@ -51,7 +53,7 @@ class PostgresTransactionalEventStore:
         events = [self._deserializer.deserialize(e) for e in serialized_events]
 
         if not events:
-            raise RuntimeError(f"No events found for aggregateId: {aggregate_id}")
+            raise AggregateDoesNotExist()
 
         creation_event = events[0]
         transformation_events = events[1:]

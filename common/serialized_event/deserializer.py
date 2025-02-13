@@ -35,7 +35,8 @@ class Deserializer:
                 first_name=payload['firstName'],
                 last_name=payload['lastName'],
                 email=payload['email'],
-                hashed_password=payload['hashedPassword']
+                hashed_password=payload['hashedPassword'],
+                verification_code=payload['verificationCode']
             )
         elif event_class == AdministratorEmailVerificationSent:
             return AdministratorEmailVerificationSent(

@@ -26,3 +26,13 @@ data_sources:
 ##########################
 
 data_destinations:
+
+  - id: Administration_Administrator_AdministratorIdFromVerificationCode
+    description: Administration_Administrator_AdministratorIdFromVerificationCode
+    type: http-push
+    endpoint: http://172.97.0.11:8080/api/v1/administration/administrator/projection/administrator-id-from-verification-code
+    username: username
+    password: password
+    sources:
+      - postgres_source
+

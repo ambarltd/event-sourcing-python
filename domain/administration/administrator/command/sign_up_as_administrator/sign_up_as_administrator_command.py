@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from common.command.command import Command
 
 @dataclass
-class SignUpCommand(Command):
+class SignUpAsAdministratorCommand(Command):
     first_name: str
     last_name: str
     email: str

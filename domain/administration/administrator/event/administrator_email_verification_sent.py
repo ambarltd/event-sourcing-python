@@ -37,5 +37,6 @@ class AdministratorEmailVerificationSent(TransformationEvent[Administrator]):
             last_name=aggregate.last_name,
             email=aggregate.email,
             is_email_verified=aggregate.is_email_verified,
-            hashed_password=aggregate.hashed_password
+            hashed_password=aggregate.hashed_password,
+            verification_code=aggregate.verification_code
         )
