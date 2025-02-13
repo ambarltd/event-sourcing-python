@@ -7,13 +7,15 @@ from domain.administration.administrator.event.administrator_email_verified impo
 from domain.administration.administrator.event.administrator_signed_up import AdministratorSignedUp
 from common.event.event import Event
 from common.serialized_event.serialized_event import SerializedEvent
+from domain.administration.administrator_email.event.administrator_email_taken import AdministratorEmailTaken
+
 
 class Deserializer:
     def __init__(self):
         self._event_types = {
-            'Administrator_AdministratorSignedUp': AdministratorSignedUp,
-            'Administrator_AdministratorEmailVerificationSent': AdministratorEmailVerificationSent,
-            'Administrator_AdministratorEmailVerified': AdministratorEmailVerified,
+            'Administration_Administrator_AdministratorSignedUp': AdministratorSignedUp,
+            'Administration_Administrator_AdministratorEmailVerificationSent': AdministratorEmailVerificationSent,
+            'Administration_Administrator_AdministratorEmailVerified': AdministratorEmailVerified,
         }
 
     def deserialize(self, serialized_event: SerializedEvent) -> Event:
@@ -60,6 +62,17 @@ class Deserializer:
                 causation_id=serialized_event.causation_id,
                 recorded_on=recorded_on,
                 with_code=payload['withCode']
+            )
+        elif event_class == AdministratorEmailTaken:
+            return AdministratorEmailTaken(
+                event_id=serialized_event.event_id,
+                aggregate_id=serialized_event.aggregate_id,
+                aggregate_version=serialized_event.aggregate_version,
+                correlation_id=serialized_event.correlation_id,
+                causation_id=serialized_event.causation_id,
+                recorded_on=recorded_on,
+                lowercase_email=payload['lowercaseEmail'],
+                administrator_id=payload['administratorId']
             )
         else:
             raise ValueError(f"Unknown event type: {serialized_event.event_name}")

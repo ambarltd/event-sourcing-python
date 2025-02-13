@@ -8,6 +8,8 @@ from domain.administration.administrator.event.administrator_email_verified impo
 from domain.administration.administrator.event.administrator_signed_up import AdministratorSignedUp
 from common.event.event import Event
 from common.serialized_event.serialized_event import SerializedEvent
+from domain.administration.administrator_email.event.administrator_email_taken import AdministratorEmailTaken
+
 
 class Serializer:
     def serialize(self, event: Event) -> SerializedEvent:
@@ -32,11 +34,11 @@ class Serializer:
 
     def _determine_event_name(self, event: Event) -> str:
         if isinstance(event, AdministratorSignedUp):
-            return 'Administrator_AdministratorSignedUp'
+            return 'Administration_Administrator_AdministratorSignedUp'
         if isinstance(event, AdministratorEmailVerificationSent):
-            return 'Administrator_AdministratorEmailVerificationSent'
+            return 'Administration_Administrator_AdministratorEmailVerificationSent'
         if isinstance(event, AdministratorEmailVerified):
-            return 'Administrator_AdministratorEmailVerified'
+            return 'Administration_Administrator_AdministratorEmailVerified'
         raise ValueError(f"Unknown event type: {event.__class__.__name__}")
 
     def _create_json_payload(self, event: Event) -> str:
@@ -58,6 +60,11 @@ class Serializer:
         elif isinstance(event, AdministratorEmailVerified):
             payload = {
                 'withCode': event.with_code
+            }
+        elif isinstance(event, AdministratorEmailTaken):
+            payload = {
+                'lowercaseEmail': event.lowercase_email,
+                'administratorId': event.administrator_id
             }
         else:
             raise ValueError(f"Unknown event type: {event.__class__.__name__}")
